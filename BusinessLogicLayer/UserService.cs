@@ -132,12 +132,14 @@ namespace BusinessLogicLayer
         }
         public string HashPassword(string password)
         {
-            using (SHA512 sha256Hash = SHA512.Create())
+            using (SHA256 sha256 = SHA256.Create())
             {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
 
+                byte[] truncatedBytes = new byte[16];
+                Array.Copy(bytes, truncatedBytes, 16);
                 StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
+                for (int i = 0; i < truncatedBytes.Length; i++)
                 {
                     builder.Append(bytes[i].ToString("x2"));
                 }

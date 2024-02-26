@@ -12,6 +12,7 @@ namespace BusinessLogicLayer
             skill.Name = skillName;
             db.Skills.Add(skill);
             db.SaveChanges();
+
             Skill newSkill = db.Skills.FirstOrDefault(s => s.Name == skillName);
             int newSkillId = newSkill.Id;
             return newSkillId;
@@ -32,6 +33,7 @@ namespace BusinessLogicLayer
             userSkill.UserId = userId;
             userSkill.SkillId = newSkillId;
             userSkill.Proficiency = updateUserSkillDTO.Proficiency;
+
             db.UserSkills.Add(userSkill);
             db.SaveChanges();
             return true;

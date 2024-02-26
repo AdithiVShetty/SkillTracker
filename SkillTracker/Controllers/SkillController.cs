@@ -12,8 +12,10 @@ namespace SkillTracker.Controllers
         {
             SkillService userSkillService = new SkillService();
             UpdateUserSkillDTO updateUserSkillsDTO = new UpdateUserSkillDTO();
+
             updateUserSkillsDTO.Name = updateUserSkillsModel.Name;
             updateUserSkillsDTO.Proficiency = updateUserSkillsModel.Proficiency;
+
             bool result = userSkillService.UpdateSkill(id, skillId, updateUserSkillsDTO);
             if (result)
             {
@@ -31,8 +33,10 @@ namespace SkillTracker.Controllers
         {
             SkillService userSkillService = new SkillService();
             UpdateUserSkillDTO updateUserSkillDTO = new UpdateUserSkillDTO();
+
             updateUserSkillDTO.Name = updateUserSkillModel.Name;
             updateUserSkillDTO.Proficiency = updateUserSkillModel.Proficiency;
+
             bool result = userSkillService.AddSkillToUserSkill(id, updateUserSkillDTO);
             if (result)
             {
