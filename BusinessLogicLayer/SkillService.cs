@@ -66,5 +66,16 @@ namespace BusinessLogicLayer
                 return false;
             }
         }
+        public string DeleteUserSkill(int userSkillId)
+        {
+            UserSkill userSkill = db.UserSkills.Find(userSkillId);
+            int userSkill_SkillId = (int)userSkill.SkillId;
+            Skill skill = db.Skills.FirstOrDefault(s => s.Id == userSkill_SkillId);
+            string userSkillName = skill.Name;
+
+            db.UserSkills.Remove(userSkill);
+            db.SaveChanges();
+            return userSkillName;
+        }
     }
 }

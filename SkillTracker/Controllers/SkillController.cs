@@ -47,5 +47,14 @@ namespace SkillTracker.Controllers
                 return Ok<string>("Error occured during adding Try Again..");
             }
         }
+
+        [HttpDelete]
+        [Route("api/Skill/{id}/DeleteSkill/{userSkillId}")]
+        public IHttpActionResult DeleteUserSkill(int id, int userSkillId)
+        {
+            SkillService userSkillService = new SkillService();
+            string skillName = userSkillService.DeleteUserSkill(userSkillId);
+            return Ok<string>($"Deleted {skillName} from userid {id}");
+        }
     }
 }
