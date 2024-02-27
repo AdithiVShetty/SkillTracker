@@ -71,11 +71,51 @@ namespace BusinessLogicLayer
             }
             return matchingUsers;
         }
-        public UserDTO GetUserDetails(int userId)
+        public AllUserDetailsDTO GetUserDetails(int userId)
         {
             User user = db.Users.Find(userId);
-            UserDTO userDTO = mapper.Map<UserDTO>(user);
-            return userDTO;
+            List<UserSkill> userSkills = db.UserSkills
+                                        .Where(skill => skill.UserId == userId)
+                                        .ToList();
+            var userDetails = userSkills
+        .Join(db.Skills, us => us.SkillId, skill => skill.Id, (us, skill) => new UpdateUserSkillDTO
+        {
+            Name = skill.Name,
+            Proficiency = us.Proficiency
+        })
+        .ToList();
+            List<UpdateUserSkillDTO> updateUserSkillsDTOs = new List<UpdateUserSkillDTO>();
+            foreach (var item in userDetails)
+            {
+                UpdateUserSkillDTO updateUserSkillsDTO = new UpdateUserSkillDTO
+                {
+                    Name = item.Name,
+                    Proficiency = item.Proficiency
+                };
+                updateUserSkillsDTOs.Add(updateUserSkillsDTO);
+            }
+
+            AllUserDetailsDTO getUserDetailsDTO = new AllUserDetailsDTO();
+            getUserDetailsDTO.Id = user.Id;
+            getUserDetailsDTO.EmailId = user.EmailId;
+            getUserDetailsDTO.Password = this.HashPassword(user.Password);
+            getUserDetailsDTO.FullName = user.FullName;
+            getUserDetailsDTO.DateOfBirth = user.DateOfBirth;
+            Int64 contact_no = Convert.ToInt64(user.ContactNo);
+            getUserDetailsDTO.ContactNo = contact_no;
+            getUserDetailsDTO.Gender = user.Gender;
+
+            getUserDetailsDTO.Skills = new List<UpdateUserSkillDTO>();
+            foreach (var skill in updateUserSkillsDTOs)
+            {
+                UpdateUserSkillDTO skillDTO = new UpdateUserSkillDTO
+                {
+                    Name = skill.Name,
+                    Proficiency = skill.Proficiency
+                };
+                getUserDetailsDTO.Skills.Add(skillDTO);
+            }
+            return getUserDetailsDTO;
         }
         public void AddUser(UserDTO newUser)
         {
@@ -138,6 +178,7 @@ namespace BusinessLogicLayer
 
                 byte[] truncatedBytes = new byte[16];
                 Array.Copy(bytes, truncatedBytes, 16);
+
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < truncatedBytes.Length; i++)
                 {

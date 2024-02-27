@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AllUserDetailsDTO.cs" />
     <Compile Include="SkillDTO.cs" />
     <Compile Include="SkillService.cs" />
     <Compile Include="UpdateUserSkillDTO.cs" />

@@ -14,6 +14,9 @@ namespace SkillTracker.Controllers
         {
             var mapConfig = new MapperConfiguration(cfg => {
                 cfg.CreateMap<UserDTO, UserModel>();
+                cfg.CreateMap<AllUserDetailsDTO, AllUserDetailsModel>()
+            .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.Skills));
+                cfg.CreateMap<UpdateUserSkillDTO, UpdateUserSkillModel>();
                 cfg.CreateMap<UserModel, DisplayModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
@@ -63,14 +66,9 @@ namespace SkillTracker.Controllers
         [Route("api/user/{id}")]
         public IHttpActionResult GetUserDetails(int id)         //View -> Admin & User(Id)
         {
-            UserDTO user = userBusiness.GetUserDetails(id);
-
-            if (user == null)
-            {
-                return Ok($"User with User ID: {id} could not be found");
-            }
-            UserModel userModel = mapper.Map<UserModel>(user);
-            return Ok(userModel);
+            AllUserDetailsDTO getUserDetailsDTOs = userBusiness.GetUserDetails(id);
+            AllUserDetailsModel getUserDetailsModel = mapper.Map<AllUserDetailsModel>(getUserDetailsDTOs);
+            return Ok(getUserDetailsModel);
         }
 
         [HttpPost]
