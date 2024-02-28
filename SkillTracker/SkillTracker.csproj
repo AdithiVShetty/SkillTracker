@@ -173,6 +173,7 @@
     </Compile>
     <Compile Include="Models\AllUserDetailsModel.cs" />
     <Compile Include="Models\DisplayModel.cs" />
+    <Compile Include="Models\ForgotPasswordModel.cs" />
     <Compile Include="Models\SkillModel.cs" />
     <Compile Include="Models\UpdateUserSkillModel.cs" />
     <Compile Include="Models\UserModel.cs" />

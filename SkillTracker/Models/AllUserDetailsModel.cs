@@ -13,7 +13,7 @@ namespace SkillTracker.Models
         public bool IsAdmin { get; set; }
         public string FullName { get; set; }
         public Nullable<System.DateTime> DateOfBirth { get; set; }
-        public Nullable<Int64> ContactNo { get; set; }
+        public string ContactNo { get; set; }
         public string Gender { get; set; }
         public List<UpdateUserSkillModel> Skills { get; set; }
     }

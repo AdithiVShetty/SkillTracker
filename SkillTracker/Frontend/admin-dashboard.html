@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <div class="container">
+        <h2>List of Users</h2>
+        <hr/>
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" id="searchInputIdOrName" class="form-control" placeholder="Search by ID or Name">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary" onclick="searchUsersByIdOrName()">Search</button>
+            </div>
+            <div class="col-md-4">
+                <input type="text" id="searchInputSkill" class="form-control" placeholder="Search by Skill">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary" onclick="searchUsersBySkill()">Search</button>
+            </div>
+        </div>
+        <br/><br/>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer;
 using SkillTracker.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
@@ -89,13 +90,20 @@ namespace SkillTracker.Controllers
         }
 
         [HttpDelete]
-        [Route("api/User/{id}")]
+        [Route("api/user/{id}/Delete")]
         public IHttpActionResult DeleteUser(int id)         //View -> Admin
         {
-            UserService userBusiness = new UserService();
-            userBusiness.DeleteUser(id);
+            try
+            {
+                UserService userBusiness = new UserService();
+                userBusiness.DeleteUser(id);
 
-            return Ok($"User with User ID: {id} is deleted.");
+                return Ok($"User with ID {id} is deleted.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut]
@@ -116,6 +124,25 @@ namespace SkillTracker.Controllers
             else
             {
                 return Ok("Error occured during updating Try Again..");
+            }
+        }
+
+        [HttpGet]
+        [Route("api/user/getusersbyskill")]
+        public IHttpActionResult GetUsersBySkill(string skillName)
+        {
+            List<UserDTO> users = userBusiness.GetUsersBySkill(skillName);
+
+            if (users.Any())
+            {
+                List<UserModel> userModelList = mapper.Map<List<UserModel>>(users);
+                List<DisplayModel> displayUsers = mapper.Map<List<DisplayModel>>(userModelList);
+
+                return Ok(displayUsers);
+            }
+            else
+            {
+                return Ok("No users found with the specified skill.");
             }
         }
 
@@ -146,6 +173,37 @@ namespace SkillTracker.Controllers
             else
             {
                 return BadRequest("Invalid EmailId or Password");
+            }
+        }
+
+        [HttpPost]
+        [Route("api/user/forgotpassword")]
+        public IHttpActionResult ForgotPassword(ForgotPasswordModel forgotPasswordModel)
+        {
+            string email = forgotPasswordModel.EmailId;
+            DateTime dob = forgotPasswordModel.DateOfBirth;
+            string newPassword = forgotPasswordModel.NewPassword;
+            string confirmPassword = forgotPasswordModel.ConfirmPassword;
+
+            if (newPassword != confirmPassword)
+            {
+                return BadRequest("Passwords do not match.");
+            }
+
+            if (userBusiness.VerifyUserEmailAndDOB(email, dob))
+            {
+                if (userBusiness.UpdatePassword(email, newPassword))
+                {
+                    return Ok("Password updated successfully.");
+                }
+                else
+                {
+                    return InternalServerError();
+                }
+            }
+            else
+            {
+                return BadRequest("Invalid email or date of birth.");
             }
         }
     }

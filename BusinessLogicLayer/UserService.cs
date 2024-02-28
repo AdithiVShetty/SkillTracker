@@ -101,8 +101,7 @@ namespace BusinessLogicLayer
             getUserDetailsDTO.Password = this.HashPassword(user.Password);
             getUserDetailsDTO.FullName = user.FullName;
             getUserDetailsDTO.DateOfBirth = user.DateOfBirth;
-            Int64 contact_no = Convert.ToInt64(user.ContactNo);
-            getUserDetailsDTO.ContactNo = contact_no;
+            getUserDetailsDTO.ContactNo = user.ContactNo; 
             getUserDetailsDTO.Gender = user.Gender;
 
             getUserDetailsDTO.Skills = new List<UpdateUserSkillDTO>();
@@ -136,10 +135,25 @@ namespace BusinessLogicLayer
         }
         public void DeleteUser(int userId)
         {
-            User user = db.Users.Find(userId);
-            db.Users.Remove(user);
+            using (var db = new SkillTrackerDBEntities())
+            {
+                User user = db.Users.Find(userId);
 
-            db.SaveChanges();
+                if (user != null)
+                {
+                    var userSkills = db.UserSkills.Where(us => us.UserId == userId);
+                    foreach (var userSkill in userSkills)
+                    {
+                        db.UserSkills.Remove(userSkill);
+                    }
+                    db.Users.Remove(user);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    throw new Exception($"User with ID {userId} not found.");
+                }
+            }
         }
         public bool UpdateUserDetails(int id, UserDTO userDTO)
         {
@@ -158,6 +172,17 @@ namespace BusinessLogicLayer
                 return false;
             }
         }
+
+        public List<UserDTO> GetUsersBySkill(string skillName)
+        {
+            DbSet<UserSkill> userSkillDb = db.UserSkills;
+
+            var usersWithSkill = userSkillDb
+                .Where(us => us.Skill.Name.Equals(skillName, StringComparison.OrdinalIgnoreCase))
+                .Select(us => us.User).ToList();
+
+            return usersWithSkill.Select(user => MapUserToUserDTO(user)).ToList();
+        }
         public UserDTO AuthenticateUser(string email, string password)
         {
             DbSet<User> userDb = db.Users;
@@ -169,6 +194,24 @@ namespace BusinessLogicLayer
                 return userDTO;
             }
             return null;
+        }
+        public bool VerifyUserEmailAndDOB(string email, DateTime dob)
+        {
+            DbSet<User> userDb = db.Users;
+            return userDb.Any(u => u.EmailId == email && u.DateOfBirth == dob);
+        }
+        public bool UpdatePassword(string email, string newPassword)
+        {
+            DbSet<User> userDb = db.Users;
+            var userToUpdate = userDb.FirstOrDefault(u => u.EmailId == email);
+
+            if (userToUpdate != null)
+            {
+                userToUpdate.Password = newPassword;
+                db.SaveChanges();
+                return true;
+            }
+            return false;
         }
         public string HashPassword(string password)
         {
