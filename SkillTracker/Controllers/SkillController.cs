@@ -43,7 +43,7 @@ namespace SkillTracker.Controllers
                 bool result = userSkillService.AddSkillToUserSkill(id, updateUserSkillDTO);
                 if (result)
                 {
-                    return Ok<string>("Skills Added Successfully!");
+                    return Ok<string>($"Successfully added {updateUserSkillDTO.Name} as a skill!");
                 }
                 else
                 {
@@ -57,11 +57,11 @@ namespace SkillTracker.Controllers
         }
 
         [HttpDelete]
-        [Route("api/Skill/{id}/DeleteSkill/{userSkillId}")]
+        [Route("api/Skill/{skillid}/DeleteSkill/{userSkillId}")]
         public IHttpActionResult DeleteUserSkill(int id, int userSkillId)
         {
             string skillName = userSkillService.DeleteUserSkill(userSkillId);
-            return Ok<string>($"Deleted {skillName} from userid {id}");
+            return Ok<string>($"Deleted {skillName} from your skills");
         }
     }
 }

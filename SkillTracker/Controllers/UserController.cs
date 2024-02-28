@@ -86,7 +86,7 @@ namespace SkillTracker.Controllers
                 Password = newUser.Password,
             };
             userBusiness.AddUser(userDTO);
-            return Ok($"User with User ID: {userDTO.Id} added successfully.");
+            return Ok($"User with UserID: {userDTO.Id} added successfully.");
         }
 
         [HttpDelete]
@@ -98,7 +98,7 @@ namespace SkillTracker.Controllers
                 UserService userBusiness = new UserService();
                 userBusiness.DeleteUser(id);
 
-                return Ok($"User with ID {id} is deleted.");
+                return Ok($"User with UserID: {id} is deleted.");
             }
             catch (Exception ex)
             {

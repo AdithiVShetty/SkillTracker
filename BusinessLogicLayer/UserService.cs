@@ -15,8 +15,7 @@ namespace BusinessLogicLayer
         public UserService()
         {
             var mapConfig = new MapperConfiguration(cfg => {
-                cfg.CreateMap<User, UserDTO>()
-                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => HashPassword(src.Password)));
+                cfg.CreateMap<User, UserDTO>();
             });
             mapper = mapConfig.CreateMapper();
         }
@@ -57,17 +56,17 @@ namespace BusinessLogicLayer
 
             if (int.TryParse(searchUser, out int userId))
             {
-                var userById = userDb.FirstOrDefault(u => u.Id == userId);
+                var userById = userDb.FirstOrDefault(user => user.Id == userId);
                 if (userById != null)
                 {
                     matchingUsers.Add(MapUserToUserDTO(userById));
                     return matchingUsers;
                 }
             }
-            var userByName = userDb.Where(u => u.FullName.StartsWith(searchUser)).ToList();
+            var userByName = userDb.Where(user => user.FullName.StartsWith(searchUser)).ToList();
             if (userByName.Any())
             {
-                matchingUsers.AddRange(userByName.Select(u => MapUserToUserDTO(u)));
+                matchingUsers.AddRange(userByName.Select(user => MapUserToUserDTO(user)));
             }
             return matchingUsers;
         }
@@ -78,12 +77,12 @@ namespace BusinessLogicLayer
                                         .Where(skill => skill.UserId == userId)
                                         .ToList();
             var userDetails = userSkills
-        .Join(db.Skills, us => us.SkillId, skill => skill.Id, (us, skill) => new UpdateUserSkillDTO
-        {
-            Name = skill.Name,
-            Proficiency = us.Proficiency
-        })
-        .ToList();
+            .Join(db.Skills, us => us.SkillId, skill => skill.Id, (us, skill) => new UpdateUserSkillDTO
+            {
+                Name = skill.Name,
+                Proficiency = us.Proficiency
+            }).ToList();
+
             List<UpdateUserSkillDTO> updateUserSkillsDTOs = new List<UpdateUserSkillDTO>();
             foreach (var item in userDetails)
             {
@@ -98,7 +97,7 @@ namespace BusinessLogicLayer
             AllUserDetailsDTO getUserDetailsDTO = new AllUserDetailsDTO();
             getUserDetailsDTO.Id = user.Id;
             getUserDetailsDTO.EmailId = user.EmailId;
-            getUserDetailsDTO.Password = this.HashPassword(user.Password);
+            getUserDetailsDTO.Password = user.Password;
             getUserDetailsDTO.FullName = user.FullName;
             getUserDetailsDTO.DateOfBirth = user.DateOfBirth;
             getUserDetailsDTO.ContactNo = user.ContactNo; 
@@ -124,9 +123,10 @@ namespace BusinessLogicLayer
             {
                 throw new InvalidOperationException("User with the same EmailId already exists.");
             }
+
             User user = new User();
             user.EmailId = newUser.EmailId;
-            user.Password = newUser.Password;
+            user.Password = HashPassword(newUser.Password);
 
             userDb.Add(user);
             db.SaveChanges();
@@ -186,7 +186,9 @@ namespace BusinessLogicLayer
         public UserDTO AuthenticateUser(string email, string password)
         {
             DbSet<User> userDb = db.Users;
-            var authenticatedUser = userDb.FirstOrDefault(u => u.EmailId == email && u.Password == password);
+            string hashedPassword = HashPassword(password);
+
+            var authenticatedUser = userDb.FirstOrDefault(u => u.EmailId == email && u.Password == hashedPassword);
 
             if (authenticatedUser != null)
             {
@@ -198,16 +200,16 @@ namespace BusinessLogicLayer
         public bool VerifyUserEmailAndDOB(string email, DateTime dob)
         {
             DbSet<User> userDb = db.Users;
-            return userDb.Any(u => u.EmailId == email && u.DateOfBirth == dob);
+            return userDb.Any(user => user.EmailId == email && user.DateOfBirth == dob);
         }
         public bool UpdatePassword(string email, string newPassword)
         {
             DbSet<User> userDb = db.Users;
-            var userToUpdate = userDb.FirstOrDefault(u => u.EmailId == email);
+            var userToUpdate = userDb.FirstOrDefault(user => user.EmailId == email);
 
             if (userToUpdate != null)
             {
-                userToUpdate.Password = newPassword;
+                userToUpdate.Password = HashPassword(newPassword);
                 db.SaveChanges();
                 return true;
             }
@@ -219,8 +221,8 @@ namespace BusinessLogicLayer
             {
                 byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
 
-                byte[] truncatedBytes = new byte[16];
-                Array.Copy(bytes, truncatedBytes, 16);
+                byte[] truncatedBytes = new byte[10];
+                Array.Copy(bytes, truncatedBytes, 10);
 
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < truncatedBytes.Length; i++)
