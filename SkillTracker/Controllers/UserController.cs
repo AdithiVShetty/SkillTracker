@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace SkillTracker.Controllers
 {
+    [EnableCors(origins: "*",headers: "*",methods:"*")]
     public class UserController : ApiController
     {
         private readonly IMapper mapper;
@@ -27,6 +29,8 @@ namespace SkillTracker.Controllers
         }
 
         UserService userBusiness = new UserService();
+
+        [Route("api/user")]
         public List<DisplayModel> GetAllUsers()        //View -> Admin
         {
             List<UserDTO> users = userBusiness.GetListOfUsers();
@@ -73,6 +77,7 @@ namespace SkillTracker.Controllers
         }
 
         [HttpPost]
+        [Route("api/user/postnewuser")]
         public IHttpActionResult PostNewUser([FromBody] UserModel newUser)      //View -> Admin
         {
             if (!ModelState.IsValid)
@@ -159,15 +164,17 @@ namespace SkillTracker.Controllers
             {
                 if (authenticatedUser.IsAdmin)
                 {
-                    List<UserDTO> allUsers = userBusiness.GetListOfUsers();
-                    List<UserModel> userModelList = mapper.Map<List<UserModel>>(allUsers);
-                    List<DisplayModel> displayUsers = mapper.Map<List<DisplayModel>>(userModelList);
-                    return Ok(displayUsers);
+                    //List<UserDTO> allUsers = userBusiness.GetListOfUsers();
+                    //List<UserModel> userModelList = mapper.Map<List<UserModel>>(allUsers);
+                    //List<DisplayModel> displayUsers = mapper.Map<List<DisplayModel>>(userModelList);
+                    //return Ok(displayUsers);
+                    return Ok(new { userType = "admin" });
                 }
                 else
                 {
-                    UserModel userModel = mapper.Map<UserModel>(authenticatedUser);
-                    return Ok(userModel);
+                    //UserModel userModel = mapper.Map<UserModel>(authenticatedUser);
+                    //return Ok(userModel);
+                    return Ok(new { userType = "user", userId = authenticatedUser.Id, name = authenticatedUser.FullName});
                 }
             }
             else

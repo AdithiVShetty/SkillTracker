@@ -186,9 +186,10 @@ namespace BusinessLogicLayer
         public UserDTO AuthenticateUser(string email, string password)
         {
             DbSet<User> userDb = db.Users;
+            string normalPassword = password;
             string hashedPassword = HashPassword(password);
 
-            var authenticatedUser = userDb.FirstOrDefault(u => u.EmailId == email && u.Password == hashedPassword);
+            var authenticatedUser = userDb.FirstOrDefault(u => u.EmailId == email && (u.Password == hashedPassword || u.Password == normalPassword));
 
             if (authenticatedUser != null)
             {

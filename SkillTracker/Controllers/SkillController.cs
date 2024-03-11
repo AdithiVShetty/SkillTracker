@@ -2,9 +2,11 @@
 using SkillTracker.Models;
 using System;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace SkillTracker.Controllers
 {
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class SkillController : ApiController
     {
         SkillService userSkillService = new SkillService();
